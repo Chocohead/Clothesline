@@ -32,7 +32,7 @@
   ],
   "accessWidener": "clothesline.accesswidener",
   "depends": {
-    "fabricloader": "*",
+    "fabricloader": ">=0.15",
     "fabric-api": "*",
     "minecraft": ">=1.20"
   },
