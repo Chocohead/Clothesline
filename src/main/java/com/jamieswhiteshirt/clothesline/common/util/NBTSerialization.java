@@ -4,57 +4,58 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class NBTSerialization {
-    public static NbtList writePersistentNetworks(List<BasicPersistentNetwork> networks) {
+    public static NbtList writePersistentNetworks(WrapperLookup registries, List<BasicPersistentNetwork> networks) {
         NbtList nbt = new NbtList();
         for (BasicPersistentNetwork network : networks) {
-            nbt.add(writePersistentNetwork(network));
+            nbt.add(writePersistentNetwork(registries, network));
         }
         return nbt;
     }
 
-    public static List<BasicPersistentNetwork> readPersistentNetworks(NbtList nbt) {
+    public static List<BasicPersistentNetwork> readPersistentNetworks(WrapperLookup registries, NbtList nbt) {
         BasicPersistentNetwork[] networks = new BasicPersistentNetwork[nbt.size()];
         for (int i = 0; i < nbt.size(); i++) {
-            networks[i] = readPersistentNetwork(nbt.getCompound(i));
+            networks[i] = readPersistentNetwork(registries, nbt.getCompound(i));
         }
         return Arrays.asList(networks);
     }
 
-    public static NbtCompound writePersistentNetwork(BasicPersistentNetwork network) {
+    public static NbtCompound writePersistentNetwork(WrapperLookup registries, BasicPersistentNetwork network) {
         NbtCompound nbt = new NbtCompound();
         nbt.putUuid("Uuid", network.getUuid());
-        nbt.put("State", writeNetworkState(network.getState()));
+        nbt.put("State", writeNetworkState(registries, network.getState()));
         return nbt;
     }
 
-    public static BasicPersistentNetwork readPersistentNetwork(NbtCompound compound) {
+    public static BasicPersistentNetwork readPersistentNetwork(WrapperLookup registries, NbtCompound compound) {
         return new BasicPersistentNetwork(
             compound.getUuid("Uuid"),
-            readNetworkState(compound.getCompound("State"))
+            readNetworkState(registries, compound.getCompound("State"))
         );
     }
 
-    public static NbtCompound writeNetworkState(BasicNetworkState state) {
+    public static NbtCompound writeNetworkState(WrapperLookup registries, BasicNetworkState state) {
         NbtCompound nbt = new NbtCompound();
         nbt.putInt("Shift", state.getShift());
         nbt.putInt("Momentum", state.getMomentum());
         nbt.put("Tree", writeBasicTree(state.getTree()));
-        nbt.put("Attachments", writeAttachments(state.getAttachments()));
+        nbt.put("Attachments", writeAttachments(registries, state.getAttachments()));
         return nbt;
     }
 
-    public static BasicNetworkState readNetworkState(NbtCompound nbt) {
+    public static BasicNetworkState readNetworkState(WrapperLookup registries, NbtCompound nbt) {
         return new BasicNetworkState(
             nbt.getInt("Shift"),
             nbt.getInt("Momentum"),
             readBasicTree(nbt.getCompound("Tree")),
-            readAttachments(nbt.getList("Attachments", NbtElement.COMPOUND_TYPE))
+            readAttachments(registries, nbt.getList("Attachments", NbtElement.COMPOUND_TYPE))
         );
     }
 
@@ -110,33 +111,33 @@ public class NBTSerialization {
         );
     }
 
-    public static NbtList writeAttachments(List<BasicAttachment> attachments) {
+    public static NbtList writeAttachments(WrapperLookup registries, List<BasicAttachment> attachments) {
         NbtList nbt = new NbtList();
         for (BasicAttachment attachment : attachments) {
-            nbt.add(writeAttachment(attachment));
+            nbt.add(writeAttachment(registries, attachment));
         }
         return nbt;
     }
 
-    public static List<BasicAttachment> readAttachments(NbtList nbt) {
+    public static List<BasicAttachment> readAttachments(WrapperLookup registries, NbtList nbt) {
         BasicAttachment[] attachments = new BasicAttachment[nbt.size()];
         for (int i = 0; i < nbt.size(); i++) {
-            attachments[i] = readAttachment(nbt.getCompound(i));
+            attachments[i] = readAttachment(registries, nbt.getCompound(i));
         }
         return Arrays.asList(attachments);
     }
 
-    public static NbtCompound writeAttachment(BasicAttachment attachment) {
+    public static NbtCompound writeAttachment(WrapperLookup registries, BasicAttachment attachment) {
         NbtCompound nbt = new NbtCompound();
         nbt.putInt("Offset", attachment.getKey());
-        attachment.getStack().writeNbt(nbt);
+        nbt.put("Stack", attachment.getStack().encodeAllowEmpty(registries));
         return nbt;
     }
 
-    public static BasicAttachment readAttachment(NbtCompound nbt) {
+    public static BasicAttachment readAttachment(WrapperLookup registries, NbtCompound nbt) {
         return new BasicAttachment(
             nbt.getInt("Offset"),
-            ItemStack.fromNbt(nbt)
+            ItemStack.fromNbtOrEmpty(registries, nbt.getCompound("Stack"))
         );
     }
 }

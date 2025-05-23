@@ -2,9 +2,12 @@ package com.jamieswhiteshirt.clothesline.common.network.message;
 
 import com.jamieswhiteshirt.clothesline.common.util.PacketByteBufSerialization;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 
-public class TryUseItemOnNetworkMessage {
+public class TryUseItemOnNetworkMessage implements CustomPayload {
+    public static final Id<TryUseItemOnNetworkMessage> ID = new Id<>(Identifier.of("clothesline", "try_use_item_on_network"));
     public final Hand hand;
     public final int networkId;
     public final int attachmentKey;
@@ -13,6 +16,11 @@ public class TryUseItemOnNetworkMessage {
         this.hand = hand;
         this.networkId = networkId;
         this.attachmentKey = attachmentKey;
+    }
+
+    @Override
+    public Id<? extends CustomPayload> getId() {
+        return ID;
     }
 
     public void serialize(PacketByteBuf buf) {

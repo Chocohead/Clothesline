@@ -5,15 +5,15 @@ import com.jamieswhiteshirt.clothesline.api.NetworkManagerProvider;
 import com.jamieswhiteshirt.clothesline.common.network.message.RemoveNetworkMessage;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.network.PacketContext;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.Context;
 
 import java.util.function.BiConsumer;
 
 @Environment(EnvType.CLIENT)
-public class RemoveNetworkMessageHandler implements BiConsumer<PacketContext, RemoveNetworkMessage> {
+public class RemoveNetworkMessageHandler implements BiConsumer<Context, RemoveNetworkMessage> {
     @Override
-    public void accept(PacketContext ctx, RemoveNetworkMessage msg) {
-        NetworkManager manager = ((NetworkManagerProvider) ctx.getPlayer().getWorld()).getNetworkManager();
+    public void accept(Context ctx, RemoveNetworkMessage msg) {
+        NetworkManager manager = ((NetworkManagerProvider) ctx.player().getWorld()).getNetworkManager();
         manager.getNetworks().removeById(msg.networkId);
     }
 }

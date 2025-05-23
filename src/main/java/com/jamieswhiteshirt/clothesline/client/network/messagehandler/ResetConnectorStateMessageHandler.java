@@ -4,17 +4,18 @@ import com.jamieswhiteshirt.clothesline.common.network.message.ResetConnectorSta
 import com.jamieswhiteshirt.clothesline.internal.ConnectorHolder;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.network.PacketContext;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.Context;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 
 import java.util.function.BiConsumer;
 
 @Environment(EnvType.CLIENT)
-public class ResetConnectorStateMessageHandler implements BiConsumer<PacketContext, ResetConnectorStateMessage> {
+public class ResetConnectorStateMessageHandler implements BiConsumer<Context, ResetConnectorStateMessage> {
     @Override
-    public void accept(PacketContext ctx, ResetConnectorStateMessage msg) {
-        Entity entity = msg.entityId != -1 ? ctx.getPlayer().getWorld().getEntityById(msg.entityId) : null;
+    public void accept(Context ctx, ResetConnectorStateMessage msg) {
+        Entity entity = msg.entityId != -1 ? ctx.player().getWorld().getEntityById(msg.entityId) : null;
         if (entity instanceof PlayerEntity) {
             ConnectorHolder connectorHolder = (ConnectorHolder) entity;
             connectorHolder.clothesline$setFrom(null);

@@ -1,10 +1,13 @@
 package com.jamieswhiteshirt.clothesline.common.network.message;
 
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 
-public class SetConnectorStateMessage {
+public class SetConnectorStateMessage implements CustomPayload {
+    public static final Id<SetConnectorStateMessage> ID = new Id<>(Identifier.of("clothesline", "set_connector_state"));
     public final int entityId;
     public final Hand hand;
     public final BlockHitResult hitResult;
@@ -13,6 +16,11 @@ public class SetConnectorStateMessage {
         this.entityId = entityId;
         this.hand = hand;
         this.hitResult = hitResult;
+    }
+
+    @Override
+    public Id<? extends CustomPayload> getId() {
+        return ID;
     }
 
     public void serialize(PacketByteBuf buf) {

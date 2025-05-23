@@ -8,6 +8,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.entity.data.DataTracker.Builder;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -15,6 +16,7 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.server.network.EntityTrackerEntry;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
@@ -28,7 +30,7 @@ public final class NetworkRaycastHitEntity extends Entity implements EntityPickI
     private NetworkRaycastHit hit;
 
     public static void init() {
-        Registry.register(Registries.ENTITY_TYPE, new Identifier("clothesline", "line"), ENTITY_TYPE);
+        Registry.register(Registries.ENTITY_TYPE, Identifier.of("clothesline", "line"), ENTITY_TYPE);
     }
 
     public NetworkRaycastHitEntity(EntityType<NetworkRaycastHitEntity> entityType, World world) {
@@ -36,7 +38,7 @@ public final class NetworkRaycastHitEntity extends Entity implements EntityPickI
     }
 
     @Override
-    protected void initDataTracker() { }
+    protected void initDataTracker(Builder builder) { }
 
     public NetworkRaycastHitEntity(World world, NetworkRaycastHit hit) {
         this(ENTITY_TYPE, world);
@@ -55,7 +57,7 @@ public final class NetworkRaycastHitEntity extends Entity implements EntityPickI
     }
 
     @Override
-    public Packet<ClientPlayPacketListener> createSpawnPacket() {
+    public Packet<ClientPlayPacketListener> createSpawnPacket(EntityTrackerEntry entry) {
         return null;
     }
 

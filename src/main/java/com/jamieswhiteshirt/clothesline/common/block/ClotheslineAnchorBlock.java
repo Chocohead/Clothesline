@@ -4,10 +4,12 @@ import com.jamieswhiteshirt.clothesline.api.*;
 import com.jamieswhiteshirt.clothesline.api.util.MutableSortedIntMap;
 import com.jamieswhiteshirt.clothesline.common.item.ClotheslineItems;
 import com.jamieswhiteshirt.clothesline.common.sound.ClotheslineSoundEvents;
+import com.mojang.serialization.MapCodec;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.*;
-import net.minecraft.block.enums.WallMountLocation;
+import net.minecraft.block.enums.BlockFace;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
@@ -20,8 +22,8 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -53,9 +55,14 @@ public class ClotheslineAnchorBlock extends WallMountedBlock implements Inventor
     public static final BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
     public static final Property<Boolean> CRANK = BooleanProperty.of("crank");
 
+    @Override
+    protected MapCodec<? extends WallMountedBlock> getCodec() {
+        throw new UnsupportedOperationException();
+    }
+
     public ClotheslineAnchorBlock(Settings settings) {
         super(settings);
-        setDefaultState(stateManager.getDefaultState().with(FACE, WallMountLocation.WALL).with(FACING, Direction.NORTH).with(WATERLOGGED, false).with(CRANK, false));
+        setDefaultState(stateManager.getDefaultState().with(FACE, BlockFace.WALL).with(FACING, Direction.NORTH).with(WATERLOGGED, false).with(CRANK, false));
     }
 
     @Override
@@ -140,16 +147,15 @@ public class ClotheslineAnchorBlock extends WallMountedBlock implements Inventor
     }
 
     @Override
-    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         NetworkManager manager = ((NetworkManagerProvider) world).getNetworkManager();
         manager.breakNode(player, pos);
-        super.onBreak(world, pos, state, player);
+        return super.onBreak(world, pos, state, player);
     }
 
-    @Deprecated
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hitResult) {
-        if (player.getStackInHand(hand).getItem() == ClotheslineItems.CLOTHESLINE) return ActionResult.PASS;
+    protected ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hitResult) {
+        if (player.getStackInHand(hand).getItem() == ClotheslineItems.CLOTHESLINE) return ItemActionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
 
         if (state.get(CRANK)) {
             NetworkNode node = getNode(world, pos);
@@ -169,9 +175,9 @@ public class ClotheslineAnchorBlock extends WallMountedBlock implements Inventor
                     networkState.setMomentum(relativeMomentum / impulseDirection);
                 }
             }
-            return ActionResult.SUCCESS;
+            return ItemActionResult.SUCCESS;
         }
-        return super.onUse(state, world, pos, player, hand, hitResult);
+        return super.onUseWithItem(stack, state, world, pos, player, hand, hitResult);
     }
 
     @Override

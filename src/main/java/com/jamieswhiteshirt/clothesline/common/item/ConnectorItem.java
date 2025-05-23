@@ -2,13 +2,13 @@ package com.jamieswhiteshirt.clothesline.common.item;
 
 import com.jamieswhiteshirt.clothesline.Clothesline;
 import com.jamieswhiteshirt.clothesline.internal.ConnectorHolder;
-import net.fabricmc.fabric.api.server.PlayerStream;
+
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
@@ -46,7 +46,7 @@ public class ConnectorItem extends Item {
     }
 
     @Override
-    public int getMaxUseTime(ItemStack stack) {
+    public int getMaxUseTime(ItemStack stack, LivingEntity user) {
         return 72000;
     }
 
@@ -71,8 +71,8 @@ public class ConnectorItem extends Item {
 
     private void applyConnectorState(ConnectorHolder connectorHolder, World world, PlayerEntity player, @Nullable ItemUsageContext ctx) {
         if (!world.isClient) {
-            Packet<ClientPlayPacketListener> packet = Clothesline.createConnectorStatePacket(ctx, player);
-            PlayerStream.watching(player).forEach(watcher -> ((ServerPlayerEntity) watcher).networkHandler.sendPacket(packet));
+            Packet<?> packet = Clothesline.createConnectorStatePacket(ctx, player);
+            PlayerLookup.tracking(player).forEach(watcher -> ((ServerPlayerEntity) watcher).networkHandler.sendPacket(packet));
         }
         connectorHolder.clothesline$setFrom(ctx);
     }

@@ -6,12 +6,17 @@ import com.jamieswhiteshirt.clothesline.common.util.NBTSerialization;
 import com.jamieswhiteshirt.clothesline.internal.NetworkProvider;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.world.PersistentState;
 
 import java.util.stream.Collectors;
 
 public class NetworkProviderPersistentState extends PersistentState {
     private final NetworkProvider provider;
+
+    public static Type<NetworkProviderPersistentState> getPersistentStateType(NetworkProvider provider) {
+        return new Type<>(() -> new NetworkProviderPersistentState(provider), (nbt, lookup) -> readNbt(lookup, nbt, provider), null);
+    }
 
     public NetworkProviderPersistentState(NetworkProvider provider) {
         this.provider = provider;
@@ -22,7 +27,7 @@ public class NetworkProviderPersistentState extends PersistentState {
         return true;
     }
 
-    public static NetworkProviderPersistentState readNbt(NbtCompound tag, NetworkProvider provider) {
+    public static NetworkProviderPersistentState readNbt(WrapperLookup registries, NbtCompound tag, NetworkProvider provider) {
         NetworkProviderPersistentState data = new NetworkProviderPersistentState(provider);
         try {
             int version;
@@ -44,7 +49,7 @@ public class NetworkProviderPersistentState extends PersistentState {
             }
 
             provider.reset(
-                    NBTSerialization.readPersistentNetworks(tag.getList("Networks", NbtElement.COMPOUND_TYPE)).stream()
+                    NBTSerialization.readPersistentNetworks(registries, tag.getList("Networks", NbtElement.COMPOUND_TYPE)).stream()
                             .map(BasicPersistentNetwork::toAbsolute)
                             .collect(Collectors.toList())
             );
@@ -55,9 +60,10 @@ public class NetworkProviderPersistentState extends PersistentState {
     }
 
     @Override
-    public NbtCompound writeNbt(NbtCompound tag) {
+    public NbtCompound writeNbt(NbtCompound tag, WrapperLookup registryLookup) {
         tag.putInt("Version", 0);
         tag.put("Networks", NBTSerialization.writePersistentNetworks(
+                registryLookup,
             provider.getNetworks().stream()
                 .map(BasicPersistentNetwork::fromAbsolute)
                 .collect(Collectors.toList())

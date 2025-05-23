@@ -6,15 +6,15 @@ import com.jamieswhiteshirt.clothesline.api.NetworkManagerProvider;
 import com.jamieswhiteshirt.clothesline.common.network.message.UpdateNetworkMessage;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.network.PacketContext;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.Context;
 
 import java.util.function.BiConsumer;
 
 @Environment(EnvType.CLIENT)
-public class UpdateNetworkMessageHandler implements BiConsumer<PacketContext, UpdateNetworkMessage> {
+public class UpdateNetworkMessageHandler implements BiConsumer<Context, UpdateNetworkMessage> {
     @Override
-    public void accept(PacketContext ctx, UpdateNetworkMessage msg) {
-        NetworkManager manager = ((NetworkManagerProvider) ctx.getPlayer().getWorld()).getNetworkManager();
+    public void accept(Context ctx, UpdateNetworkMessage msg) {
+        NetworkManager manager = ((NetworkManagerProvider) ctx.player().getWorld()).getNetworkManager();
         Network network = manager.getNetworks().getById(msg.networkId);
         if (network != null) {
             network.getState().setShift(msg.shift);

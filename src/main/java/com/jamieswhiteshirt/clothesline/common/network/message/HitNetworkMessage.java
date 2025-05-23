@@ -2,8 +2,11 @@ package com.jamieswhiteshirt.clothesline.common.network.message;
 
 import com.jamieswhiteshirt.clothesline.common.util.PacketByteBufSerialization;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.util.Identifier;
 
-public class HitNetworkMessage {
+public class HitNetworkMessage implements CustomPayload {
+    public static final Id<HitNetworkMessage> ID = new Id<>(Identifier.of("clothesline", "hit_network"));
     public final int networkId;
     public final int attachmentKey;
     public final int offset;
@@ -12,6 +15,11 @@ public class HitNetworkMessage {
         this.networkId = networkId;
         this.attachmentKey = attachmentKey;
         this.offset = offset;
+    }
+
+    @Override
+    public Id<? extends CustomPayload> getId() {
+        return ID;
     }
 
     public void serialize(PacketByteBuf buf) {

@@ -2,14 +2,13 @@ package com.jamieswhiteshirt.clothesline.client.render;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourceReloadListenerKeys;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedModelManager;
-import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
@@ -19,24 +18,23 @@ import java.util.Collections;
 
 @Environment(EnvType.CLIENT)
 public class BakedModels {
-    private static final ModelIdentifier CRANK = new ModelIdentifier(new Identifier("clothesline", "crank"), "inventory");
-    private static final ModelIdentifier PULLEY_WHEEL = new ModelIdentifier(new Identifier("clothesline", "pulley_wheel"), "inventory");
-    private static final ModelIdentifier PULLEY_WHEEL_ROPE = new ModelIdentifier(new Identifier("clothesline", "pulley_wheel_rope"), "inventory");
+    private static final Identifier CRANK = Identifier.of("clothesline", "item/crank");
+    private static final Identifier PULLEY_WHEEL = Identifier.of("clothesline", "item/pulley_wheel");
+    private static final Identifier PULLEY_WHEEL_ROPE = Identifier.of("clothesline", "item/pulley_wheel_rope");
 
     public static BakedModel crank;
     public static BakedModel pulleyWheel;
     public static BakedModel pulleyWheelRope;
 
     public static void init() {
-        ModelLoadingRegistry.INSTANCE.registerModelProvider((manager, out) -> {
-            out.accept(PULLEY_WHEEL);
-            out.accept(PULLEY_WHEEL_ROPE);
+        ModelLoadingPlugin.register(context -> {
+            context.addModels(CRANK, PULLEY_WHEEL, PULLEY_WHEEL_ROPE);
         });
 
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
             @Override
             public Identifier getFabricId() {
-                return new Identifier("clothesline", "models");
+                return Identifier.of("clothesline", "models");
             }
 
             @Override

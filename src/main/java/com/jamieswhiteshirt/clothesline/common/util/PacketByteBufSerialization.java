@@ -1,27 +1,29 @@
 package com.jamieswhiteshirt.clothesline.common.util;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.Arrays;
 import java.util.UUID;
 
 public class PacketByteBufSerialization {
-    public static void writeNetwork(PacketByteBuf buf, BasicNetwork network) {
+    public static void writeNetwork(RegistryByteBuf buf, BasicNetwork network) {
         writeNetworkId(buf, network.getId());
         writePersistentNetwork(buf, network.getPersistentNetwork());
     }
 
-    public static BasicNetwork readNetwork(PacketByteBuf buf) {
+    public static BasicNetwork readNetwork(RegistryByteBuf buf) {
         return new BasicNetwork(readNetworkId(buf), readPersistentNetwork(buf));
     }
 
-    public static void writePersistentNetwork(PacketByteBuf buf, BasicPersistentNetwork network) {
+    public static void writePersistentNetwork(RegistryByteBuf buf, BasicPersistentNetwork network) {
         writeNetworkUuid(buf, network.getUuid());
         writeNetworkState(buf, network.getState());
     }
 
-    public static BasicPersistentNetwork readPersistentNetwork(PacketByteBuf buf) {
+    public static BasicPersistentNetwork readPersistentNetwork(RegistryByteBuf buf) {
         return new BasicPersistentNetwork(readNetworkUuid(buf), readNetworkState(buf));
     }
 
@@ -42,25 +44,25 @@ public class PacketByteBufSerialization {
         return buf.readVarInt();
     }
 
-    public static void writeNetworkState(PacketByteBuf buf, BasicNetworkState state) {
+    public static void writeNetworkState(RegistryByteBuf buf, BasicNetworkState state) {
         writeBasicTree(buf, state.getTree());
         buf.writeInt(state.getShift());
         buf.writeInt(state.getMomentum());
         buf.writeShort(state.getAttachments().size());
         for (BasicAttachment attachment : state.getAttachments()) {
             buf.writeInt(attachment.getKey());
-            buf.writeItemStack(attachment.getStack());
+            ItemStack.OPTIONAL_PACKET_CODEC.encode(buf, attachment.getStack());
         }
     }
 
-    public static BasicNetworkState readNetworkState(PacketByteBuf buf) {
+    public static BasicNetworkState readNetworkState(RegistryByteBuf buf) {
         BasicTree tree = readBasicTree(buf);
         int offset = buf.readInt();
         int momentum = buf.readInt();
         int numAttachments = buf.readUnsignedShort();
         BasicAttachment[] attachments = new BasicAttachment[numAttachments];
         for (int i = 0; i < numAttachments; i++) {
-            attachments[i] = new BasicAttachment(buf.readInt(), buf.readItemStack());
+            attachments[i] = new BasicAttachment(buf.readInt(), ItemStack.OPTIONAL_PACKET_CODEC.decode(buf));
         }
         return new BasicNetworkState(
             offset,
@@ -93,15 +95,15 @@ public class PacketByteBufSerialization {
         return new BasicTree(pos, Arrays.asList(edges), buf.readInt());
     }
 
-    public static void writeAttachment(PacketByteBuf buf, BasicAttachment attachment) {
+    public static void writeAttachment(RegistryByteBuf buf, BasicAttachment attachment) {
         buf.writeInt(attachment.getKey());
-        buf.writeItemStack(attachment.getStack());
+        ItemStack.OPTIONAL_PACKET_CODEC.encode(buf, attachment.getStack());
     }
 
-    public static BasicAttachment readAttachment(PacketByteBuf buf) {
+    public static BasicAttachment readAttachment(RegistryByteBuf buf) {
         return new BasicAttachment(
             buf.readInt(),
-            buf.readItemStack()
+            ItemStack.OPTIONAL_PACKET_CODEC.decode(buf)
         );
     }
 }

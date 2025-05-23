@@ -28,7 +28,7 @@ class NetworkTest {
     }
 
     NetworkImpl network;
-    Identifier eventListenerKey = new Identifier("test", "test");
+    Identifier eventListenerKey = Identifier.of("test", "test");
     @BeforeEach
     void resetNetwork() {
         BlockPos posA = new BlockPos(0, 0, 0);

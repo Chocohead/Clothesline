@@ -65,7 +65,7 @@ public class ClotheslineItems {
     }
 
     private static Item register(String id, Item item) {
-        return register(new Identifier("clothesline", id), item);
+        return register(Identifier.of("clothesline", id), item);
     }
 
     private static Item register(Identifier id, Item item) {

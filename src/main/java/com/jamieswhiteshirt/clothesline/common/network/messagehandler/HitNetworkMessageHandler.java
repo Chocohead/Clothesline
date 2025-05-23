@@ -2,7 +2,9 @@ package com.jamieswhiteshirt.clothesline.common.network.messagehandler;
 
 import com.jamieswhiteshirt.clothesline.api.*;
 import com.jamieswhiteshirt.clothesline.common.network.message.HitNetworkMessage;
-import net.fabricmc.fabric.api.network.PacketContext;
+
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.Context;
+
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -11,10 +13,10 @@ import net.minecraft.world.World;
 
 import java.util.function.BiConsumer;
 
-public class HitNetworkMessageHandler implements BiConsumer<PacketContext, HitNetworkMessage> {
+public class HitNetworkMessageHandler implements BiConsumer<Context, HitNetworkMessage> {
     @Override
-    public void accept(PacketContext ctx, HitNetworkMessage message) {
-        PlayerEntity player = ctx.getPlayer();
+    public void accept(Context ctx, HitNetworkMessage message) {
+        PlayerEntity player = ctx.player();
         World world = player.getWorld();
         NetworkManager manager = ((NetworkManagerProvider) world).getNetworkManager();
         Network network = manager.getNetworks().getById(message.networkId);

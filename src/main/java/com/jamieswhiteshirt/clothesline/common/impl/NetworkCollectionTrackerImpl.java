@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.function.Function;
 
 public final class NetworkCollectionTrackerImpl<T> implements NetworkCollectionTracker<T> {
-    private static final Identifier LISTENER_KEY = new Identifier("clothesline", "watcher");
+    private static final Identifier LISTENER_KEY = Identifier.of("clothesline", "watcher");
 
     private final NetworkCollection networks;
     private final Function<ChunkPos, Collection<T>> getChunkWatchers;

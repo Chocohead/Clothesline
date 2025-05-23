@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class NetworkCollectionTest {
-    Identifier eventListenerKey = new Identifier("test", "test");
+    Identifier eventListenerKey = Identifier.of("test", "test");
 
     NetworkCollection collection;
     Network network0 = createNetwork(0, new UUID(0, 0), new BlockPos(0, 0, 0), new BlockPos(1, 1, 1));

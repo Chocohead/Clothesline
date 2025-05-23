@@ -18,7 +18,8 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.network.listener.ClientCommonPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.util.hit.BlockHitResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,7 +48,7 @@ public class Clothesline implements ModInitializer {
         });
     }
 
-    public static CustomPayloadS2CPacket createConnectorStatePacket(@Nullable ItemUsageContext ctx, Entity entity) {
+    public static Packet<ClientCommonPacketListener>  createConnectorStatePacket(@Nullable ItemUsageContext ctx, Entity entity) {
         if (ctx != null) {
             return MessageChannels.SET_CONNECTOR_STATE.createClientboundPacket(new SetConnectorStateMessage(
                 entity.getId(),

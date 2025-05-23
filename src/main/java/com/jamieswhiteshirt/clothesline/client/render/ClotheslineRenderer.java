@@ -12,7 +12,7 @@ import com.jamieswhiteshirt.rtree3i.Selection;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.enums.WallMountLocation;
+import net.minecraft.block.enums.BlockFace;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.*;
@@ -72,16 +72,16 @@ public final class ClotheslineRenderer {
 
             pos.set(x1, y1, 0.0F, 1.0F);
             pos.mul(matrices.getPositionMatrix());
-            posNormal(vertices, pos, normal).texture(uFrom, vFrom).light(lightFrom).next();
+            posNormal(vertices, pos, normal).texture(uFrom, vFrom).light(lightFrom);
             pos.set(x2, y2, 0.0F, 1.0F);
             pos.mul(matrices.getPositionMatrix());
-            posNormal(vertices, pos, normal).texture(uTo, vFrom).light(lightFrom).next();
+            posNormal(vertices, pos, normal).texture(uTo, vFrom).light(lightFrom);
             pos.set(x2, y2, length, 1.0F);
             pos.mul(matrices.getPositionMatrix());
-            posNormal(vertices, pos, normal).texture(uTo, vTo).light(lightTo).next();
+            posNormal(vertices, pos, normal).texture(uTo, vTo).light(lightTo);
             pos.set(x1, y1, length, 1.0F);
             pos.mul(matrices.getPositionMatrix());
-            posNormal(vertices, pos, normal).texture(uFrom, vTo).light(lightTo).next();
+            posNormal(vertices, pos, normal).texture(uFrom, vTo).light(lightTo);
         }
     }
 
@@ -104,7 +104,7 @@ public final class ClotheslineRenderer {
 
             matrices.push();
             matrices.translate(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D);
-            if (state.get(ClotheslineAnchorBlock.FACE) == WallMountLocation.CEILING) {
+            if (state.get(ClotheslineAnchorBlock.FACE) == BlockFace.CEILING) {
                 matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180.0F));
                 crankRotation = -crankRotation;
             }
@@ -185,8 +185,8 @@ public final class ClotheslineRenderer {
             float x = EDGE_VERTEX_X[side];
             float y = EDGE_VERTEX_Y[side];
 
-            vertices.vertex(matrices.peek().getPositionMatrix(), x, y, 0.0F).color(r, g, b, a).normal(0, 0, 0).next();
-            vertices.vertex(matrices.peek().getPositionMatrix(), x, y, (float) edge.getPathEdge().getLength() / AttachmentUnit.UNITS_PER_BLOCK).color(r, g, b, a).normal(0, 0, 0).next();
+            vertices.vertex(matrices.peek().getPositionMatrix(), x, y, 0.0F).color(r, g, b, a).normal(0, 0, 0);
+            vertices.vertex(matrices.peek().getPositionMatrix(), x, y, (float) edge.getPathEdge().getLength() / AttachmentUnit.UNITS_PER_BLOCK).color(r, g, b, a).normal(0, 0, 0);
         }
         matrices.pop();
     }

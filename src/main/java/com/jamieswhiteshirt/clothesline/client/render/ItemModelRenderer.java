@@ -46,7 +46,7 @@ public class ItemModelRenderer {
     private static void renderQuadsColored(MatrixStack matrices, VertexConsumer vertices, List<BakedQuad> quads, int light, int overlay) {
         MatrixStack.Entry entry = matrices.peek();
         for (BakedQuad bakedQuad : quads) {
-            vertices.quad(entry, bakedQuad, 1.0F, 1.0F, 1.0F, light, overlay);
+            vertices.quad(entry, bakedQuad, 1.0F, 1.0F, 1.0F, 1F, light, overlay);
         }
     }
 

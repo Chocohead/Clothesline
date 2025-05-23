@@ -8,16 +8,18 @@ import com.jamieswhiteshirt.clothesline.common.network.message.RemoveAttachmentM
 import com.jamieswhiteshirt.clothesline.common.network.message.SetAttachmentMessage;
 import com.jamieswhiteshirt.clothesline.common.network.message.TryUseItemOnNetworkMessage;
 import com.jamieswhiteshirt.clothesline.common.util.BasicAttachment;
-import net.fabricmc.fabric.api.network.PacketContext;
+
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.Context;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import java.util.function.BiConsumer;
 
-public class TryUseItemOnNetworkMessageHandler implements BiConsumer<PacketContext, TryUseItemOnNetworkMessage> {
+public class TryUseItemOnNetworkMessageHandler implements BiConsumer<Context, TryUseItemOnNetworkMessage> {
     @Override
-    public void accept(PacketContext ctx, TryUseItemOnNetworkMessage message) {
-        ServerPlayerEntity player = (ServerPlayerEntity) ctx.getPlayer();
+    public void accept(Context ctx, TryUseItemOnNetworkMessage message) {
+        ServerPlayerEntity player = ctx.player();
         NetworkManager manager = ((NetworkManagerProvider) player.getWorld()).getNetworkManager();
         Network network = manager.getNetworks().getById(message.networkId);
         if (network != null) {

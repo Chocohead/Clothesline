@@ -21,6 +21,6 @@ public class ClotheslineItemGroups {
             .build();
     
     public static void init() {
-        Registry.register(Registries.ITEM_GROUP, new Identifier("clothesline", "items"), ITEMS);
+        Registry.register(Registries.ITEM_GROUP, Identifier.of("clothesline", "items"), ITEMS);
     }
 }

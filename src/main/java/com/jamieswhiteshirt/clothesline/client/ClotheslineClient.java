@@ -34,7 +34,7 @@ public class ClotheslineClient implements ClientModInitializer {
 
         BlockRenderLayerMap.INSTANCE.putBlock(ClotheslineBlocks.CLOTHESLINE_ANCHOR, RenderLayer.getCutout());
         CoreShaderRegistrationCallback.EVENT.register(context -> {
-			Identifier id = new Identifier("clothesline", "rendertype_clothesline");
+			Identifier id = Identifier.of("clothesline", "rendertype_clothesline");
 			context.register(id, ClotheslineRenderLayers.getClothesline().getVertexFormat(), program -> clotheslineShader = program);
 		});
 

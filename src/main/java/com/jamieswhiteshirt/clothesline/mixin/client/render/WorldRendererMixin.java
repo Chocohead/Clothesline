@@ -41,16 +41,16 @@ public abstract class WorldRendererMixin {
         ),
         method = "render"
     )
-    private void renderClotheslines(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f projectionMatrix, CallbackInfo ci, @Local(ordinal = 0) double x, @Local(ordinal = 1) double y, @Local(ordinal = 2) double z, @Local Frustum frustum, @Local VertexConsumerProvider.Immediate immediate) {
+    private void renderClotheslines(RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f positionMatrix, Matrix4f projectionMatrix, CallbackInfo ci, @Local(ordinal = 0) double x, @Local(ordinal = 1) double y, @Local(ordinal = 2) double z, @Local Frustum frustum, @Local MatrixStack matrices, @Local VertexConsumerProvider.Immediate immediate) {
         world.getProfiler().swap("clotheslines");
 
         NetworkManager manager = ((NetworkManagerProvider) world).getNetworkManager();
-        boolean showDebugInfo = client.options.debugEnabled;
+        boolean showDebugInfo = client.inGameHud.getDebugHud().shouldShowDebugHud();
 
         matrices.push();
         matrices.translate(-x, -y, -z);
 
-        clotheslineRenderer.render(matrices, immediate, world, manager.getNetworks().getNodes(), manager.getNetworks().getEdges(), frustum, tickDelta);
+        clotheslineRenderer.render(matrices, immediate, world, manager.getNetworks().getNodes(), manager.getNetworks().getEdges(), frustum, tickCounter.getTickDelta(false));
         if (showDebugInfo) {
             clotheslineRenderer.debugRender(matrices, immediate, manager.getNetworks().getNodes(), manager.getNetworks().getEdges(), frustum, camera);
         }
@@ -61,7 +61,7 @@ public abstract class WorldRendererMixin {
                 ConnectorHolder connector = (ConnectorHolder) playerEntity;
                 ItemUsageContext from = connector.clothesline$getFrom();
                 if (from != null) {
-                    clotheslineRenderer.renderFirstPersonPlayerHeldClothesline(matrices, immediate, playerEntity, from.getBlockPos(), tickDelta);
+                    clotheslineRenderer.renderFirstPersonPlayerHeldClothesline(matrices, immediate, playerEntity, from.getBlockPos(), tickCounter.getTickDelta(false));
                 }
             }
         }
@@ -83,7 +83,7 @@ public abstract class WorldRendererMixin {
         ),
         method = "render"
     )
-    private void renderHighlight(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f positionMatrix, CallbackInfo ci, @Local Profiler profiler, @Local(ordinal = 0) double x, @Local(ordinal = 1) double y, @Local(ordinal = 2) double z, @Local VertexConsumerProvider.Immediate immediate) {
+    private void renderHighlight(RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f positionMatrix, Matrix4f projectionMatrix, CallbackInfo ci, @Local Profiler profiler, @Local(ordinal = 0) double x, @Local(ordinal = 1) double y, @Local(ordinal = 2) double z, @Local MatrixStack matrices, @Local VertexConsumerProvider.Immediate immediate) {
         HitResult hitResult = client.crosshairTarget;
         if (renderBlockOutline && hitResult != null && hitResult.getType() == HitResult.Type.ENTITY && ((EntityHitResult) hitResult).getEntity() instanceof NetworkRaycastHitEntity entity) {
             profiler.swap("outline");

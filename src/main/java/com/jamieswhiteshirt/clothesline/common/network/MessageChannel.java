@@ -1,43 +1,37 @@
 package com.jamieswhiteshirt.clothesline.common.network;
 
-import io.netty.buffer.Unpooled;
-import net.fabricmc.fabric.api.network.PacketContext;
-import net.fabricmc.fabric.api.network.PacketRegistry;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
-import net.minecraft.util.Identifier;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketDecoder;
+import net.minecraft.network.codec.PacketEncoder;
+import net.minecraft.network.listener.ClientCommonPacketListener;
+import net.minecraft.network.listener.ServerCommonPacketListener;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.network.packet.CustomPayload.Id;
+import net.minecraft.network.packet.Packet;
 
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
-public final class MessageChannel<T> {
-    private final Identifier id;
-    private final BiConsumer<T, PacketByteBuf> serializer;
-    private final Function<PacketByteBuf, T> deserializer;
+public abstract class MessageChannel<T extends CustomPayload, C> {
+    protected final Id<T> id;
+    protected final PacketEncoder<RegistryByteBuf, T> serializer;
+    protected final PacketDecoder<RegistryByteBuf, T> deserializer;
 
-    public MessageChannel(Identifier id, BiConsumer<T, PacketByteBuf> serializer, Function<PacketByteBuf, T> deserializer) {
+    public MessageChannel(Id<T> id, PacketEncoder<RegistryByteBuf, T> serializer, PacketDecoder<RegistryByteBuf, T> deserializer) {
         this.id = id;
         this.serializer = serializer;
         this.deserializer = deserializer;
     }
 
-    public void registerHandler(PacketRegistry registry, BiConsumer<PacketContext, T> handler) {
-        registry.register(id, (ctx, buf) -> {
-            T msg = deserializer.apply(buf);
-            ctx.getTaskQueue().execute(() -> handler.accept(ctx, msg));
-        });
+    public abstract void registerHandler(BiConsumer<C, T> handler);
+
+    public Packet<ClientCommonPacketListener> createClientboundPacket(T msg) {
+        return ServerPlayNetworking.createS2CPacket(msg);
     }
 
-    public CustomPayloadS2CPacket createClientboundPacket(T msg) {
-        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-        serializer.accept(msg, buf);
-        return new CustomPayloadS2CPacket(id, buf);
-    }
-
-    public CustomPayloadC2SPacket createServerboundPacket(T msg) {
-        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-        serializer.accept(msg, buf);
-        return new CustomPayloadC2SPacket(id, buf);
+    public Packet<ServerCommonPacketListener> createServerboundPacket(T msg) {
+        return ClientPlayNetworking.createC2SPacket(msg);
     }
 }
